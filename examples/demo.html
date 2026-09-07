@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>BugReplay demo</title></head>
+<body>
+  <h1>BugReplay demo</h1>
+  <p>Build the package, serve this directory with the compiled bundle, then reproduce an interaction and export the session.</p>
+  <button id="start">Start recording</button>
+  <button id="stop" disabled>Stop + export</button>
+  <button id="fail">Trigger console error</button>
+  <script type="module">
+    // Replace this import with your bundler's output when testing locally.
+    const start = document.querySelector('#start');
+    const stop = document.querySelector('#stop');
+    let recorder;
+    start.onclick = async () => {
+      const mod = await import('../dist/index.js');
+      recorder = mod.createRecorder();
+      recorder.start();
+      start.disabled = true;
+      stop.disabled = false;
+    };
+    stop.onclick = () => {
+      const bundle = recorder.stop();
+      recorder.download(bundle);
+      start.disabled = false;
+      stop.disabled = true;
+      console.log(bundle);
+    };
+    document.querySelector('#fail').onclick = () => console.error('Demo error: something failed');
+  </script>
+</body>
+</html>
